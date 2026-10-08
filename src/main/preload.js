@@ -18,8 +18,10 @@ contextBridge.exposeInMainWorld('removebg', {
   useModel: id => call('model:use', id),
   pickFiles: () => call('files:pick', 'files'),
   pickFolder: () => call('files:pick', 'folder'),
-  /* dropped files: the page only sees File objects; their paths come from Electron */
-  addDropped: fileList => call('files:add', Array.from(fileList || [], f => webUtils.getPathForFile(f)).filter(Boolean)),
+  /* dropped files: the page only sees File objects; their paths come from
+     Electron. The page passes a plain array of File objects: a FileList does
+     not survive the bridge (it arrives empty). */
+  addDropped: files => call('files:add', (Array.isArray(files) ? files : []).map(f => { try { return webUtils.getPathForFile(f); } catch { return ''; } }).filter(Boolean)),
   removeItems: ids => call('files:remove', ids),
   clearItems: which => call('files:clear', which),
   thumb: (id, which) => call('thumb', id, which),

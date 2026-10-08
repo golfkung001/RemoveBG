@@ -1,7 +1,7 @@
 {
   "name": "removebg",
   "productName": "RemoveBG",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Remove product photo backgrounds on your own Windows PC with the BiRefNet AI model.",
   "main": "src/main/main.js",
