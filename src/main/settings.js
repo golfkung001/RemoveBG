@@ -8,7 +8,7 @@ const { normaliseOptions, DEFAULTS } = require('../core/cutout');
 const VERSION = 1;
 
 function defaults() {
-  return { version: VERSION, lang: 'th', model: '', useGpu: false, outputMode: 'beside', outputDir: '', output: { ...DEFAULTS } };
+  return { version: VERSION, lang: 'th', model: '', useGpu: false, autoUpdate: true, lastVersion: '', outputMode: 'beside', outputDir: '', output: { ...DEFAULTS } };
 }
 
 /* Any stored or incoming value made safe: unknown keys dropped, bad values reset. */
@@ -18,6 +18,8 @@ function sanitise(s) {
   if (['th', 'en'].includes(s.lang)) r.lang = s.lang;
   if (['', 'general', 'lite'].includes(s.model)) r.model = s.model;
   r.useGpu = s.useGpu === true;
+  r.autoUpdate = s.autoUpdate !== false;
+  if (typeof s.lastVersion === 'string' && /^\d+\.\d+\.\d+$/.test(s.lastVersion)) r.lastVersion = s.lastVersion;
   if (['beside', 'folder'].includes(s.outputMode)) r.outputMode = s.outputMode;
   if (typeof s.outputDir === 'string' && s.outputDir.length < 1024 && (s.outputDir === '' || path.isAbsolute(s.outputDir))) r.outputDir = s.outputDir;
   if (r.outputMode === 'folder' && !r.outputDir) r.outputMode = 'beside';

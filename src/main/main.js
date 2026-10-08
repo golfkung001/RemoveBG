@@ -7,9 +7,10 @@ const sharp = require('sharp');
 const models = require('./models');
 const files = require('./files');
 const settingsStore = require('./settings');
+const { Updates, newer } = require('./updater');
 
 const REPO = 'https://github.com/golfkung001/RemoveBG';
-const EXTERNAL = { repo: REPO, help: REPO + '#readme', issues: REPO + '/issues' };
+const EXTERNAL = { repo: REPO, help: REPO + '#readme', issues: REPO + '/issues', releases: REPO + '/releases' };
 
 if (process.env.REMOVEBG_USER_DATA) app.setPath('userData', path.resolve(process.env.REMOVEBG_USER_DATA));
 const selfTestArg = process.argv.find(a => a.startsWith('--self-test='));
@@ -21,7 +22,7 @@ const dataDir = () => app.getPath('userData');
 const modelDir = () => path.join(dataDir(), 'models');
 const settingsFile = () => path.join(dataDir(), 'settings.json');
 
-let win = null, settings = null;
+let win = null, settings = null, updates = null, justUpdated = null;
 
 /* ---------- the AI process ---------- */
 
@@ -160,6 +161,8 @@ function status() {
     models: Object.fromEntries(Object.values(models.MODELS).map(m => [m.id, { bytes: m.bytes, installed: models.installed(modelDir())[m.id] }])),
     downloading: downloading ? downloading.id : '',
     provider: worker.provider,
+    update: updates ? updates.state : null,
+    justUpdated,
     totalMemGB: Math.round(os.totalmem() / 2 ** 30),
     dark: nativeTheme.shouldUseDarkColors
   };
@@ -181,8 +184,10 @@ function registerIpc() {
     if (!patch || typeof patch !== 'object') return settings;
     const merged = { ...settings, ...patch, output: { ...settings.output, ...(patch.output || {}) } };
     if ('outputDir' in patch) merged.outputDir = settings.outputDir;     // only set through the folder dialog
+    merged.lastVersion = settings.lastVersion;
     settings = settingsStore.sanitise(merged);
     settingsStore.save(settingsFile(), settings);
+    if (settings.autoUpdate) updates.start(); else updates.stop();
     return settings;
   });
 
@@ -287,6 +292,19 @@ function registerIpc() {
   });
 
   handle('open:external', key => { if (EXTERNAL[key]) shell.openExternal(EXTERNAL[key]); return true; });
+  handle('open:release', version => {
+    if (/^\d+\.\d+\.\d+$/.test(String(version))) shell.openExternal(`${REPO}/releases/tag/v${version}`);
+    return true;
+  });
+
+  handle('update:check', () => updates.check(true));
+  handle('update:download', () => updates.download());
+  handle('update:install', () => {
+    if (running || !updates.install()) return false;
+    worker.stop();
+    return true;
+  });
+  handle('update:seen', () => { justUpdated = null; return true; });
   handle('open:data', () => { shell.openPath(dataDir()); return true; });
 }
 
@@ -330,6 +348,9 @@ async function selfTest(outFile) {
     result.size = [info.width, info.height];
     result.ok = info.channels === 4 && a(Math.floor(info.width / 2), Math.floor(info.height / 2)) > 200 && a(0, 0) === 0 && Math.abs(info.width - 200) <= 6 && Math.abs(info.height - 240) <= 6;
     result.steps.push('cut-out written');
+    require('electron-updater');
+    if (app.isPackaged && !fs.existsSync(path.join(process.resourcesPath, 'app-update.yml'))) throw new Error('app-update.yml is missing');
+    result.steps.push('updater');
   } catch (e) {
     result.error = String(e.message || e);
   } finally {
@@ -353,12 +374,34 @@ app.whenReady().then(async () => {
     return;
   }
   settings = settingsStore.load(settingsFile());
+  /* the first start after an update says so */
+  const version = app.getVersion();
+  if (settings.lastVersion && newer(version, settings.lastVersion)) justUpdated = { from: settings.lastVersion, to: version };
+  if (settings.lastVersion !== version) { settings = settingsStore.sanitise({ ...settings, lastVersion: version }); settingsStore.save(settingsFile(), settings); }
+  updates = createUpdates();
   /* a model chosen earlier but deleted since; or the first one found */
   const have = models.installed(modelDir());
   if (!have[settings.model]) settings.model = have.general ? 'general' : have.lite ? 'lite' : '';
   registerIpc();
   createWindow();
+  if (settings.autoUpdate) updates.start();
 });
 
-app.on('window-all-closed', () => { worker.stop(); downloading?.cancel(); app.quit(); });
+function createUpdates() {
+  let updater = null, packaged = app.isPackaged;
+  if (process.env.REMOVEBG_FAKE_UPDATE && !app.isPackaged) {
+    /* try the update screens without a release (development runs only) */
+    const { FakeUpdater } = require('../../tests/helpers/fake-updater');
+    updater = new FakeUpdater(process.env.REMOVEBG_FAKE_UPDATE);
+    updater.on('fake-quit-and-install', () => app.quit());
+    packaged = true;
+  } else if (app.isPackaged) {
+    updater = require('electron-updater').autoUpdater;
+  }
+  const u = new Updates({ updater, version: app.getVersion(), packaged, isBusy: () => running });
+  u.on('state', st => emit('update', st));
+  return u;
+}
+
+app.on('window-all-closed', () => { worker.stop(); downloading?.cancel(); updates?.stop(); app.quit(); });
 app.on('before-quit', () => worker.stop());

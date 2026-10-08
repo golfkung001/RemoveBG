@@ -44,7 +44,7 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
-  margin: 0; display: grid; grid-template-rows: auto 1fr auto; background: var(--bg); color: var(--text);
+  margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text);
   font: 15px/1.55 "Leelawadee UI", "Segoe UI", "Noto Sans Thai", "Noto Sans", Tahoma, sans-serif;
   -webkit-font-smoothing: antialiased; overflow: hidden;
 }
@@ -88,6 +88,7 @@ button, input, select { font: inherit; color: inherit; }
 .foot .link { margin-left: auto; font-size: 13px; }
 
 /* ---------- first run ---------- */
+.setup, .work { flex: 1 1 auto; }
 .setup { overflow: auto; padding: 32px 24px; display: flex; justify-content: center; align-items: flex-start; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .setup-card { width: min(860px, 100%); padding: 32px; }
@@ -216,3 +217,29 @@ select { min-height: 38px; padding: 6px 10px; border-radius: 9px; border: 1px so
   .work { grid-template-columns: 1fr 320px; }
   .models { grid-template-columns: 1fr; }
 }
+
+/* ---------- updates ---------- */
+.ubar { display: flex; align-items: center; gap: 14px; padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--accent-soft); }
+.ubar.ready { background: var(--ok-soft); }
+.ubar.bad { background: var(--bad-soft); }
+.ubar-icon { flex: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--accent); color: #fff; }
+.ubar.ready .ubar-icon { background: var(--ok); }
+.ubar.bad .ubar-icon { background: var(--bad); }
+@media (prefers-color-scheme: dark) { .ubar-icon { color: #111318; } }
+.ubar-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ubar-body strong { font-size: 15px; }
+.ubar-body span { font-size: 13.5px; color: var(--muted); }
+.ubar-progress { margin-top: 6px; max-width: 520px; }
+.ubar-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.foot .hl { color: var(--accent); font-weight: 700; }
+.foot #check-update { margin-left: 0; }
+.spinner { width: 44px; height: 44px; border-radius: 50%; border: 4px solid var(--accent-soft); border-top-color: var(--accent); animation: spin 0.9s linear infinite; }
+.spinner.small { width: 20px; height: 20px; border-width: 3px; border-color: rgba(255, 255, 255, .35); border-top-color: #fff; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+.installing { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(10, 12, 16, .7); }
+.installing-box { width: min(520px, 100%); background: var(--panel); border-radius: 18px; padding: 32px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, .4); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.installing-box h2 { font-size: 22px; }
+.installing-box p { margin: 0; color: var(--muted); }
+.steps { text-align: left; margin: 8px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
+.steps .now { color: var(--text); font-weight: 700; }
