@@ -1,4 +1,29 @@
-# RemoveBG — ตัดพื้นหลังภาพสินค้าด้วย AI บนเครื่องของคุณ
+<div align="center">
+
+<img src="build/icon.png" width="112" alt="RemoveBG">
+
+# RemoveBG
+
+**ตัดพื้นหลังภาพสินค้าด้วย AI บนเครื่องของคุณ**<br>
+ฟรี · ไม่ต้องสมัคร · ไม่ส่งภาพขึ้นอินเทอร์เน็ต · หน้าจอภาษาไทย
+
+<br>
+
+<a href="https://github.com/golfkung001/RemoveBG/releases/latest/download/RemoveBG-Setup.exe"><img src="docs/images/download-button.png" width="620" alt="ดาวน์โหลด RemoveBG สำหรับ Windows"></a>
+
+<sub><a href="https://github.com/golfkung001/RemoveBG/releases">ทุกเวอร์ชันและรายละเอียดการเปลี่ยนแปลง</a> · <a href="#ติดตั้ง-3-ขั้นตอน">วิธีติดตั้ง</a> · <a href="#แก้ปัญหา">แก้ปัญหา</a> · <a href="#สำหรับนักพัฒนา-english">English</a></sub>
+
+<br><br>
+
+[![Release](https://img.shields.io/github/v/release/golfkung001/RemoveBG?label=release&color=4f46e5)](https://github.com/golfkung001/RemoveBG/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/golfkung001/RemoveBG/total?label=downloads&color=0ea5b7)](https://github.com/golfkung001/RemoveBG/releases)
+[![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4)](#สิ่งที่ต้องมี)
+[![Build](https://github.com/golfkung001/RemoveBG/actions/workflows/build.yml/badge.svg)](https://github.com/golfkung001/RemoveBG/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-64748b)](LICENSE)
+
+</div>
+
+---
 
 โปรแกรม Windows สำหรับลบพื้นหลังภาพสินค้า ลากภาพเข้ามาแล้วกดปุ่มเดียว ได้ภาพพื้นโปร่งใส (PNG/WebP) หรือพื้นสีขาว/สีที่เลือก (JPG) ทีละหลายภาพ
 ใช้โมเดล AI **BiRefNet** วิธีเดียวกับที่ใช้ทำภาพสินค้าทั้งหมดของเว็บ Hi End Audio
@@ -23,10 +48,10 @@
 
 ## ติดตั้ง (3 ขั้นตอน)
 
-1. เปิดหน้า **[Releases](https://github.com/golfkung001/RemoveBG/releases/latest)** แล้วดาวน์โหลดไฟล์ **`RemoveBG-Setup-x.x.x.exe`** (อยู่ในหัวข้อ Assets)
+1. กดปุ่ม **ดาวน์โหลดสำหรับ Windows** ด้านบน จะได้ไฟล์ **`RemoveBG-Setup.exe`** (หรือเปิดหน้า [Releases](https://github.com/golfkung001/RemoveBG/releases/latest) แล้วเลือกไฟล์ในหัวข้อ Assets)
 2. ดับเบิลคลิกไฟล์ที่ดาวน์โหลดมา
    ถ้าขึ้นหน้าต่างสีน้ำเงิน **"Windows protected your PC"** ให้กด **More info (ข้อมูลเพิ่มเติม)** แล้วกด **Run anyway (เรียกใช้ต่อไป)**
-   หน้าต่างนี้ขึ้นเพราะโปรแกรมยังไม่ได้ซื้อใบรับรองดิจิทัลจาก Microsoft ไม่ได้แปลว่ามีไวรัส ตรวจสอบได้ว่าไฟล์ตรงกับที่ GitHub สร้างจากค่า SHA-256 ในไฟล์ `SHA256SUMS.txt` ข้างตัวติดตั้ง
+   หน้าต่างนี้ขึ้นเพราะโปรแกรมยังไม่ได้ซื้อใบรับรองดิจิทัลจาก Microsoft ไม่ได้แปลว่ามีไวรัส ตรวจสอบได้ว่าไฟล์ตรงกับที่ GitHub สร้างจากค่า SHA-256 ในไฟล์ `SHA256SUMS.txt` ในหน้า Releases
 3. โปรแกรมติดตั้งเสร็จเองในไม่กี่วินาที (ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ) แล้วจะเปิดขึ้นมาให้ทันที ครั้งต่อไปเปิดจากไอคอน **RemoveBG** บน Desktop หรือเมนู Start
 
 ## เปิดครั้งแรก: ดาวน์โหลดโมเดล AI
@@ -141,7 +166,7 @@ Notes:
 ### Releases
 
 [`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push and pull request on `windows-latest`: tests, installer build, self-test of the packaged app, silent install and self-test of the installed app. The installer is attached to the run as an artifact.
-To publish a release: set `version` in `package.json`, merge to `main`, then push a tag `vX.Y.Z` with the same version. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe` and `SHA256SUMS.txt` to a GitHub Release.
+To publish a release: set `version` in `package.json`, merge to `main`, then push a tag `vX.Y.Z` with the same version. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe`, the same file as `RemoveBG-Setup.exe` (the stable name the download button links to through `releases/latest/download/`), and `SHA256SUMS.txt` to a GitHub Release.
 The installer is not code-signed, so Windows SmartScreen asks for confirmation (see Install, step 2).
 
 ## License and credits
