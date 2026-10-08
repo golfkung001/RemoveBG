@@ -300,7 +300,7 @@
   pane.addEventListener('drop', async e => {
     e.preventDefault(); depth = 0; $('overlay').hidden = true;
     if (queue.running) return;
-    const r = await api.addDropped(e.dataTransfer.files);
+    const r = await api.addDropped(Array.from(e.dataTransfer.files));
     if (r.length) addItems(r); else toast(t('list.none'));
   });
 
