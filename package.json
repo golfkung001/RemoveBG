@@ -1,0 +1,81 @@
+{
+  "name": "removebg",
+  "productName": "RemoveBG",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remove product photo backgrounds on your own Windows PC with the BiRefNet AI model.",
+  "main": "src/main/main.js",
+  "license": "MIT",
+  "author": "golfkung001",
+  "homepage": "https://github.com/golfkung001/RemoveBG",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "self-test": "electron . --self-test=self-test.json",
+    "icons": "node tools/make-icon.js",
+    "dist": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "dependencies": {
+    "onnxruntime-node": "1.30.0",
+    "sharp": "0.35.5"
+  },
+  "build": {
+    "appId": "io.github.golfkung001.removebg",
+    "productName": "RemoveBG",
+    "copyright": "Copyright © 2026 golfkung001",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "package.json",
+      "src/**/*",
+      "!**/*.map",
+      "!node_modules/onnxruntime-node/bin/napi-v*/{darwin,linux}/**",
+      "!node_modules/onnxruntime-node/bin/napi-v*/win32/arm64/**",
+      "!node_modules/onnxruntime-node/lib/**",
+      "!node_modules/onnxruntime-node/script/**"
+    ],
+    "asarUnpack": [
+      "node_modules/sharp/**",
+      "node_modules/@img/**",
+      "node_modules/onnxruntime-node/**",
+      "src/assets/**"
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "RemoveBG-Setup-${version}.exe",
+      "legalTrademarks": "RemoveBG"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RemoveBG",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerLanguages": [
+        "th_TH",
+        "en_US"
+      ],
+      "language": "1054",
+      "unicode": true
+    }
+  }
+}

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'">
+  <title>RemoveBG</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="icon.png" alt="" width="36" height="36">
+      <div>
+        <h1>RemoveBG</h1>
+        <p data-i18n="app.tagline"></p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="seg" role="radiogroup" data-i18n-aria="lang.label" id="lang">
+        <button type="button" role="radio" data-lang="th">ไทย</button>
+        <button type="button" role="radio" data-lang="en">EN</button>
+      </div>
+      <button type="button" class="btn ghost" id="help" data-i18n="help"></button>
+    </div>
+  </header>
+
+  <!-- first run: get the model -->
+  <main id="setup" class="setup" hidden>
+    <section class="card setup-card">
+      <h2 data-i18n="setup.title"></h2>
+      <p class="lead" data-i18n="setup.lead"></p>
+      <p class="ram" id="ram"></p>
+      <div class="models" id="models"></div>
+      <div class="dl" id="dl" hidden>
+        <div class="bar"><span id="dl-bar"></span></div>
+        <div class="dl-row"><span id="dl-text" aria-live="polite"></span><button type="button" class="btn ghost" id="dl-cancel" data-i18n="dl.cancel"></button></div>
+      </div>
+      <p class="msg" id="setup-msg" role="alert"></p>
+      <button type="button" class="link" id="import" data-i18n="model.import"></button>
+    </section>
+  </main>
+
+  <!-- work -->
+  <main id="work" class="work" hidden>
+    <section class="list-pane" id="list-pane" aria-label="Photos">
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><rect x="8" y="14" width="48" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="23" cy="28" r="5" fill="currentColor"/><path d="M12 48l14-14 9 9 7-7 10 10" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M48 4v14M41 11h14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <h2 data-i18n="drop.title"></h2>
+        <div class="drop-actions">
+          <button type="button" class="btn primary" id="pick-files" data-i18n="drop.files"></button>
+          <span data-i18n="drop.or"></span>
+          <button type="button" class="btn" id="pick-folder" data-i18n="drop.folder"></button>
+        </div>
+        <p class="hint" data-i18n="drop.formats"></p>
+      </div>
+
+      <div class="list" id="list" hidden>
+        <div class="list-bar">
+          <span id="summary" aria-live="polite"></span>
+          <div class="list-actions">
+            <button type="button" class="btn small" id="add-files" data-i18n="list.add"></button>
+            <button type="button" class="btn small" id="add-folder" data-i18n="list.addFolder"></button>
+            <button type="button" class="btn small ghost" id="clear-done" data-i18n="list.clearDone"></button>
+            <button type="button" class="btn small ghost" id="clear-all" data-i18n="list.clearAll"></button>
+          </div>
+        </div>
+        <ul class="grid" id="grid"></ul>
+      </div>
+      <div class="drop-overlay" id="overlay" hidden><span data-i18n="drop.overlay"></span></div>
+    </section>
+
+    <aside class="opts" aria-labelledby="opt-title">
+      <h2 id="opt-title" data-i18n="opt.title"></h2>
+      <div class="opts-body">
+      <fieldset>
+        <legend data-i18n="opt.format"></legend>
+        <div class="seg wide" role="radiogroup" id="format">
+          <button type="button" role="radio" data-v="png" data-i18n="opt.format.png"></button>
+          <button type="button" role="radio" data-v="webp" data-i18n="opt.format.webp"></button>
+          <button type="button" role="radio" data-v="jpg" data-i18n="opt.format.jpg"></button>
+        </div>
+        <p class="note" data-i18n="opt.format.note"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="opt.bg"></legend>
+        <div class="seg wide" role="radiogroup" id="bg">
+          <button type="button" role="radio" data-v="transparent" data-i18n="opt.bg.transparent"></button>
+          <button type="button" role="radio" data-v="white" data-i18n="opt.bg.white"></button>
+          <button type="button" role="radio" data-v="colour" data-i18n="opt.bg.colour"></button>
+        </div>
+        <label class="colour-row" id="colour-row" hidden><input type="color" id="colour"><span id="colour-hex"></span></label>
+        <p class="note" id="jpg-note" data-i18n="opt.bg.jpgNote" hidden></p>
+      </fieldset>
+
+      <fieldset>
+        <label class="switch"><input type="checkbox" id="trim"><span data-i18n="opt.trim"></span></label>
+        <label class="range" id="margin-row"><span id="margin-label"></span><input type="range" id="margin" min="0" max="20" step="1"></label>
+        <label class="switch"><input type="checkbox" id="square"><span data-i18n="opt.square"></span></label>
+      </fieldset>
+
+      <fieldset>
+        <label class="field"><span data-i18n="opt.size"></span>
+          <select id="size"><option value="0"></option><option value="2000"></option><option value="1600"></option><option value="1200"></option><option value="1000"></option><option value="800"></option></select>
+        </label>
+        <label class="field"><span data-i18n="opt.clean"></span>
+          <select id="clean"><option value="auto" data-i18n="opt.clean.auto"></option><option value="on" data-i18n="opt.clean.on"></option><option value="off" data-i18n="opt.clean.off"></option></select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend data-i18n="opt.save"></legend>
+        <label class="radio"><input type="radio" name="save" value="beside"><span data-i18n="opt.save.beside"></span></label>
+        <label class="radio"><input type="radio" name="save" value="folder"><span data-i18n="opt.save.folder"></span></label>
+        <div class="folder-row"><code id="out-dir"></code><button type="button" class="btn small" id="choose-dir" data-i18n="opt.save.choose"></button></div>
+      </fieldset>
+
+      <details class="adv">
+        <summary data-i18n="opt.advanced"></summary>
+        <label class="field"><span data-i18n="opt.model"></span><select id="model"></select></label>
+        <div class="models compact" id="models-adv"></div>
+        <label class="switch"><input type="checkbox" id="gpu"><span data-i18n="opt.gpu"></span></label>
+        <p class="note" data-i18n="opt.gpu.note"></p>
+        <button type="button" class="link" id="data-folder" data-i18n="opt.dataFolder"></button>
+      </details>
+      </div>
+
+      <div class="run">
+        <div class="progress" id="progress" hidden><div class="bar"><span id="run-bar"></span></div><span id="run-text" aria-live="polite"></span></div>
+        <button type="button" class="btn primary big" id="start"></button>
+        <button type="button" class="btn big" id="stop" hidden data-i18n="run.stop"></button>
+        <button type="button" class="btn ghost" id="open-out" hidden data-i18n="run.openFolder"></button>
+        <p class="note" data-i18n="run.note"></p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-model"></span><span id="foot-device"></span><span id="foot-version"></span>
+    <button type="button" class="link" id="source" data-i18n="foot.source"></button>
+  </footer>
+
+  <!-- preview -->
+  <div class="modal" id="preview" role="dialog" aria-modal="true" aria-labelledby="pv-name" hidden>
+    <div class="modal-box">
+      <div class="pv-top">
+        <h2 id="pv-name"></h2>
+        <div class="seg" role="radiogroup" id="pv-mode">
+          <button type="button" role="radio" data-v="before" data-i18n="pv.before"></button>
+          <button type="button" role="radio" data-v="after" data-i18n="pv.after"></button>
+          <button type="button" role="radio" data-v="compare" data-i18n="pv.compare"></button>
+        </div>
+        <div class="seg" role="radiogroup" id="pv-bg" data-i18n-aria="pv.bg">
+          <button type="button" role="radio" data-v="checker" data-i18n="pv.checker"></button>
+          <button type="button" role="radio" data-v="white" data-i18n="pv.white"></button>
+          <button type="button" role="radio" data-v="black" data-i18n="pv.black"></button>
+          <button type="button" role="radio" data-v="grey" data-i18n="pv.grey"></button>
+        </div>
+      </div>
+      <div class="pv-stage" id="pv-stage">
+        <figure class="pv-pane pv-b"><img id="pv-before" alt=""><figcaption data-i18n="pv.before"></figcaption></figure>
+        <figure class="pv-pane pv-a"><img id="pv-after" alt=""><figcaption data-i18n="pv.after"></figcaption><p class="pv-empty" id="pv-empty" data-i18n="pv.notYet" hidden></p></figure>
+      </div>
+      <div class="pv-bottom">
+        <button type="button" class="btn ghost" id="pv-prev" data-i18n-aria="pv.prev">‹</button>
+        <span id="pv-output"></span>
+        <button type="button" class="btn ghost" id="pv-next" data-i18n-aria="pv.next">›</button>
+        <span class="grow"></span>
+        <button type="button" class="btn" id="pv-show" data-i18n="pv.show"></button>
+        <button type="button" class="btn primary" id="pv-close" data-i18n="pv.close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

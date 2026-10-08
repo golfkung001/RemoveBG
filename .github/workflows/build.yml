@@ -1,0 +1,96 @@
+name: Build
+
+# Every push and pull request: tests, then the Windows installer is built and
+# checked (the packaged app and the installed app each run their self-test).
+# The installer is attached to the run as an artifact.
+# A tag such as v1.0.0 also publishes it as a GitHub Release.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - name: Version matches the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $v = (Get-Content package.json | ConvertFrom-Json).version
+          if ("v$v" -ne "${{ github.ref_name }}") { throw "package.json version $v does not match tag ${{ github.ref_name }}" }
+
+      - name: Build the installer
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: Self-test the packaged app
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'packaged.json'
+          $p = Start-Process -FilePath 'dist\win-unpacked\RemoveBG.exe' -ArgumentList "--self-test=$out" -Wait -PassThru
+          Get-Content $out
+          if ($p.ExitCode -ne 0) { throw "self-test failed ($($p.ExitCode))" }
+
+      - name: Install silently and self-test the installed app
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\RemoveBG-Setup-*.exe | Select-Object -First 1
+          Start-Process -FilePath $setup.FullName -ArgumentList '/S' -Wait
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\RemoveBG\RemoveBG.exe'
+          if (-not (Test-Path $exe)) { throw "not installed at $exe" }
+          $out = Join-Path $env:RUNNER_TEMP 'installed.json'
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test=$out" -Wait -PassThru
+          Get-Content $out
+          if ($p.ExitCode -ne 0) { throw "installed self-test failed ($($p.ExitCode))" }
+          "Installer size: {0:N1} MB" -f ($setup.Length / 1MB)
+          (Get-FileHash $setup.FullName -Algorithm SHA256).Hash + '  ' + $setup.Name | Out-File -Encoding ascii dist\SHA256SUMS.txt
+          Get-Content dist\SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RemoveBG-Windows
+          path: |
+            dist/RemoveBG-Setup-*.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: RemoveBG-Windows
+          path: out
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/RemoveBG-Setup-*.exe
+            out/SHA256SUMS.txt
+          generate_release_notes: true
