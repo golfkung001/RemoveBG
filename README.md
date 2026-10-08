@@ -181,7 +181,7 @@ Notes:
 ### Releases
 
 [`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push and pull request on `windows-latest`: tests, installer build, self-test of the packaged app, silent install and self-test of the installed app. The installer is attached to the run as an artifact.
-To publish a release: set `version` in `package.json`, merge to `main`, then push a tag `vX.Y.Z` with the same version. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe`, the same file as `RemoveBG-Setup.exe` (the stable name the download button links to through `releases/latest/download/`), and `SHA256SUMS.txt` to a GitHub Release.
+To publish a release: set `version` in `package.json` and merge to `main`. Then either push a tag `vX.Y.Z` with the same version, or run the **Build** workflow by hand on `main` with **release** ticked (Actions → Build → Run workflow), which creates the tag itself. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe`, the same file as `RemoveBG-Setup.exe` (the stable name the download button links to through `releases/latest/download/`), and `SHA256SUMS.txt` to a GitHub Release.
 The installer is not code-signed, so Windows SmartScreen asks for confirmation (see Install, step 2).
 
 ## License and credits
