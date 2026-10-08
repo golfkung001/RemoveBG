@@ -45,6 +45,13 @@ jobs:
       - name: Build the installer
         run: npx electron-builder --win --x64 --publish never
 
+      - name: Update files are there
+        shell: pwsh
+        run: |
+          foreach ($f in 'dist\latest.yml', 'dist\win-unpacked\resources\app-update.yml') { if (-not (Test-Path $f)) { throw "$f is missing" } }
+          Get-Content dist\latest.yml
+          Get-Content dist\win-unpacked\resources\app-update.yml
+
       - name: Self-test the packaged app
         shell: pwsh
         run: |
@@ -73,6 +80,8 @@ jobs:
           name: RemoveBG-Windows
           path: |
             dist/RemoveBG-Setup-*.exe
+            dist/RemoveBG-Setup-*.exe.blockmap
+            dist/latest.yml
             dist/SHA256SUMS.txt
           if-no-files-found: error
 
@@ -88,9 +97,22 @@ jobs:
           name: RemoveBG-Windows
           path: out
 
+      # the same installer under a name that never changes, so
+      # releases/latest/download/RemoveBG-Setup.exe always gives the newest one
+      - name: Stable file name
+        run: |
+          cd out
+          cp RemoveBG-Setup-*.exe RemoveBG-Setup.exe
+          echo "$(sha256sum RemoveBG-Setup.exe | cut -d' ' -f1 | tr a-f A-F)  RemoveBG-Setup.exe" >> SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - uses: softprops/action-gh-release@v2
         with:
+          # latest.yml and the blockmap are what installed copies read to update themselves
           files: |
             out/RemoveBG-Setup-*.exe
+            out/RemoveBG-Setup-*.exe.blockmap
+            out/RemoveBG-Setup.exe
+            out/latest.yml
             out/SHA256SUMS.txt
           generate_release_notes: true

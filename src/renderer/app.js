@@ -5,7 +5,7 @@
   const items = new Map();       // id -> item from the app
   const thumbs = new Map();      // id -> data URL
   let S = null;                  // status from the app (settings, models, ...)
-  let lang = 'th', queue = { running: false, total: 0, done: 0 }, stopping = false, lastDl = null;
+  let U = null, dismissed = '', lang = 'th', queue = { running: false, total: 0, done: 0 }, stopping = false, lastDl = null;
 
   /* ---------- words ---------- */
 
@@ -62,6 +62,7 @@
     renderOptions();
     renderFooter();
     renderList();
+    U = S.update; renderUpdate();
   }
 
   async function setSettings(patch) {
@@ -167,6 +168,7 @@
     $('out-dir').textContent = s.outputDir || '—';
     $('out-dir').title = s.outputDir || '';
     $('gpu').checked = s.useGpu;
+    $('auto-update').checked = s.autoUpdate;
     const lock = queue.running;
     document.querySelectorAll('.opts fieldset, #gpu, #model').forEach(el => { el.disabled = lock; });
   }
@@ -188,6 +190,7 @@
   }));
   $('choose-dir').onclick = async () => { S.settings = await api.pickOutputDir(); renderOptions(); };
   $('gpu').onchange = e => setSettings({ useGpu: e.target.checked });
+  $('auto-update').onchange = e => setSettings({ autoUpdate: e.target.checked });
   $('model').onchange = async e => { S.settings = await api.useModel(e.target.value); refresh(); };
   $('data-folder').onclick = () => api.openDataFolder();
   segKeys($('lang'), async v => { await setSettings({ lang: v }); lang = v; applyWords(); renderModels(); renderOptions(); renderFooter(); renderList(); }, 'lang');
@@ -198,6 +201,7 @@
     $('foot-model').textContent = t('foot.model', { m: modelName(S.settings.model) });
     $('foot-device').textContent = S.provider ? t('foot.device', { d: S.provider === 'gpu' ? 'GPU (DirectML)' : 'CPU' }) : '';
     $('foot-version').textContent = t('foot.version', { v: S.version });
+    renderUpdate();
   }
 
   /* ---------- the list ---------- */
@@ -344,6 +348,78 @@
       else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
     }
   });
+
+
+  /* ---------- updates ---------- */
+
+  const MB = b => (b / 1048576).toFixed(b > 100 * 1048576 ? 0 : 1);
+  const ICONS = {
+    info: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+    spin: '<span class="spinner small"></span>',
+    ok: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>'
+  };
+
+  function actions(list) {
+    const box = $('ubar-actions');
+    box.replaceChildren(...list.map(([label, fn, kind, disabled]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn small ' + (kind || ''); b.textContent = label; b.disabled = !!disabled; b.onclick = fn;
+      return b;
+    }));
+  }
+
+  function bar(kind, icon, title, text, pct) {
+    const el = $('ubar');
+    el.hidden = false; el.className = 'ubar ' + kind;
+    $('ubar-icon').innerHTML = ICONS[icon];
+    $('ubar-title').textContent = title; $('ubar-text').textContent = text;
+    $('ubar-progress').hidden = pct == null;
+    if (pct != null) $('ubar-fill').style.width = pct + '%';
+  }
+
+  function renderUpdate() {
+    if (!S) return;
+    const u = U || { status: 'dev' }, done = S.justUpdated;
+    /* the footer always says where things stand */
+    const foot = { latest: t('upd.foot.latest'), available: t('upd.foot.available', { v: u.version }), downloading: t('upd.foot.downloading', { pct: u.percent }), downloaded: t('upd.foot.downloaded'), checking: t('upd.checking') }[u.status] || '';
+    $('foot-update').textContent = foot ? '· ' + foot : '';
+    $('foot-update').className = u.status === 'available' || u.status === 'downloaded' ? 'hl' : '';
+    $('check-update').disabled = ['checking', 'downloading', 'installing'].includes(u.status);
+    $('check-update').hidden = u.status === 'dev';
+
+    $('installing').hidden = u.status !== 'installing';
+    if (u.status === 'installing') { $('inst-title').textContent = t('upd.installing.title', { v: u.version }); return; }
+
+    if (u.status === 'available' && dismissed !== u.version) {
+      bar('info', 'info', t('upd.available.title', { v: u.version }), t('upd.available.text', { cur: u.current, mb: MB(u.size || 0) }));
+      actions([[t('upd.download'), () => api.downloadUpdate(), 'primary'], [t('upd.whatsNew'), () => api.openRelease(u.version), 'ghost'], [t('upd.later'), () => { dismissed = u.version; renderUpdate(); }, 'ghost']]);
+    } else if (u.status === 'downloading') {
+      bar('info', 'spin', t('upd.downloading.title', { v: u.version, pct: u.percent }), t('upd.downloading.text', { done: MB(u.transferred), total: MB(u.total || u.size || 0), speed: (u.speed / 1048576).toFixed(1) }), u.percent);
+      actions([]);
+    } else if (u.status === 'downloaded') {
+      bar('ready', 'ok', t('upd.downloaded.title', { v: u.version }), queue.running ? t('upd.downloaded.busy') : t('upd.downloaded.text'), null);
+      actions([[t('upd.install'), async () => { await api.installUpdate(); }, 'primary', queue.running], [t('upd.whatsNew'), () => api.openRelease(u.version), 'ghost']]);
+    } else if (u.status === 'error' && (u.manual || u.stage === 'downloading' || u.version)) {
+      bar('bad', 'warn', t('upd.error.title'), window.I18N.en['upd.error.' + u.error] ? t('upd.error.' + u.error) : u.error, null);
+      actions([[t('upd.retry'), () => (u.version && u.stage === 'downloading' ? api.downloadUpdate() : api.checkUpdate()), 'primary'], [t('upd.close'), () => { $('ubar').hidden = true; }, 'ghost']]);
+    } else if (done) {
+      bar('ready', 'ok', t('upd.done.title', { v: done.to }), t('upd.done.text', { from: done.from }), null);
+      actions([[t('upd.whatsNew'), () => api.openRelease(done.to), 'ghost'], [t('upd.close'), () => { S.justUpdated = null; api.updateSeen(); renderUpdate(); }, 'ghost']]);
+    } else {
+      $('ubar').hidden = true;
+    }
+  }
+
+  api.onUpdate(u => {
+    const was = U?.status;
+    U = u; renderUpdate();
+    if (u.manual && u.status === 'latest' && was === 'checking') toast(t('upd.latestToast', { v: u.current }));
+    if (u.manual && u.status === 'dev') toast(t('upd.dev'));
+    if (u.status === 'available' && was !== 'available') dismissed = '';
+  });
+  $('check-update').onclick = () => api.checkUpdate();
+  api.onQueue(() => renderUpdate());
 
   refresh();
 })();

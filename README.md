@@ -1,4 +1,29 @@
-# RemoveBG — ตัดพื้นหลังภาพสินค้าด้วย AI บนเครื่องของคุณ
+<div align="center">
+
+<img src="build/icon.png" width="112" alt="RemoveBG">
+
+# RemoveBG
+
+**ตัดพื้นหลังภาพสินค้าด้วย AI บนเครื่องของคุณ**<br>
+ฟรี · ไม่ต้องสมัคร · ไม่ส่งภาพขึ้นอินเทอร์เน็ต · หน้าจอภาษาไทย
+
+<br>
+
+<a href="https://github.com/golfkung001/RemoveBG/releases/latest/download/RemoveBG-Setup.exe"><img src="docs/images/download-button.png" width="620" alt="ดาวน์โหลด RemoveBG สำหรับ Windows"></a>
+
+<sub><a href="https://github.com/golfkung001/RemoveBG/releases">ทุกเวอร์ชันและรายละเอียดการเปลี่ยนแปลง</a> · <a href="#ติดตั้ง-3-ขั้นตอน">วิธีติดตั้ง</a> · <a href="#แก้ปัญหา">แก้ปัญหา</a> · <a href="#สำหรับนักพัฒนา-english">English</a></sub>
+
+<br><br>
+
+[![Release](https://img.shields.io/github/v/release/golfkung001/RemoveBG?label=release&color=4f46e5)](https://github.com/golfkung001/RemoveBG/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/golfkung001/RemoveBG/total?label=downloads&color=0ea5b7)](https://github.com/golfkung001/RemoveBG/releases)
+[![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4)](#สิ่งที่ต้องมี)
+[![Build](https://github.com/golfkung001/RemoveBG/actions/workflows/build.yml/badge.svg)](https://github.com/golfkung001/RemoveBG/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-64748b)](LICENSE)
+
+</div>
+
+---
 
 โปรแกรม Windows สำหรับลบพื้นหลังภาพสินค้า ลากภาพเข้ามาแล้วกดปุ่มเดียว ได้ภาพพื้นโปร่งใส (PNG/WebP) หรือพื้นสีขาว/สีที่เลือก (JPG) ทีละหลายภาพ
 ใช้โมเดล AI **BiRefNet** วิธีเดียวกับที่ใช้ทำภาพสินค้าทั้งหมดของเว็บ Hi End Audio
@@ -23,10 +48,10 @@
 
 ## ติดตั้ง (3 ขั้นตอน)
 
-1. เปิดหน้า **[Releases](https://github.com/golfkung001/RemoveBG/releases/latest)** แล้วดาวน์โหลดไฟล์ **`RemoveBG-Setup-x.x.x.exe`** (อยู่ในหัวข้อ Assets)
+1. กดปุ่ม **ดาวน์โหลดสำหรับ Windows** ด้านบน จะได้ไฟล์ **`RemoveBG-Setup.exe`** (หรือเปิดหน้า [Releases](https://github.com/golfkung001/RemoveBG/releases/latest) แล้วเลือกไฟล์ในหัวข้อ Assets)
 2. ดับเบิลคลิกไฟล์ที่ดาวน์โหลดมา
    ถ้าขึ้นหน้าต่างสีน้ำเงิน **"Windows protected your PC"** ให้กด **More info (ข้อมูลเพิ่มเติม)** แล้วกด **Run anyway (เรียกใช้ต่อไป)**
-   หน้าต่างนี้ขึ้นเพราะโปรแกรมยังไม่ได้ซื้อใบรับรองดิจิทัลจาก Microsoft ไม่ได้แปลว่ามีไวรัส ตรวจสอบได้ว่าไฟล์ตรงกับที่ GitHub สร้างจากค่า SHA-256 ในไฟล์ `SHA256SUMS.txt` ข้างตัวติดตั้ง
+   หน้าต่างนี้ขึ้นเพราะโปรแกรมยังไม่ได้ซื้อใบรับรองดิจิทัลจาก Microsoft ไม่ได้แปลว่ามีไวรัส ตรวจสอบได้ว่าไฟล์ตรงกับที่ GitHub สร้างจากค่า SHA-256 ในไฟล์ `SHA256SUMS.txt` ในหน้า Releases
 3. โปรแกรมติดตั้งเสร็จเองในไม่กี่วินาที (ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ) แล้วจะเปิดขึ้นมาให้ทันที ครั้งต่อไปเปิดจากไอคอน **RemoveBG** บน Desktop หรือเมนู Start
 
 ## เปิดครั้งแรก: ดาวน์โหลดโมเดล AI
@@ -87,6 +112,19 @@
 | ไม่พบวัตถุในภาพ | ภาพไม่มีวัตถุเด่นชัด หรือเป็นภาพฉากทั้งภาพ ลองครอปให้สินค้าเด่นขึ้นก่อน |
 | Windows ไม่ยอมเปิดตัวติดตั้ง | ดูขั้นตอนที่ 2 ของการติดตั้ง (More info → Run anyway) |
 
+## อัปเดตโปรแกรม
+
+โปรแกรมตรวจหาเวอร์ชันใหม่เองทุกครั้งที่เปิด (และทุก 6 ชั่วโมง) หรือกด **ตรวจหาอัปเดต** ที่แถบล่างของหน้าต่าง
+
+1. มีเวอร์ชันใหม่ จะมีแถบแจ้งด้านบน กด **ดาวน์โหลดอัปเดต** (กด "มีอะไรใหม่" เพื่อดูรายละเอียดก่อนได้)
+2. ระหว่างดาวน์โหลดจะเห็นเปอร์เซ็นต์ ขนาด และความเร็ว ใช้โปรแกรมต่อได้ตามปกติ
+3. ดาวน์โหลดเสร็จ แถบจะเป็นสีเขียว กด **รีสตาร์ทและติดตั้ง** โปรแกรมจะปิด ติดตั้ง แล้วเปิดขึ้นมาใหม่เองในประมาณ 10–30 วินาที (ถ้ากำลังตัดภาพอยู่ จะติดตั้งได้เมื่อทำเสร็จ) หรือปล่อยไว้ก็ได้ จะติดตั้งให้ตอนปิดโปรแกรมครั้งถัดไป
+4. เปิดขึ้นมาใหม่จะมีแถบ **"อัปเดตเป็นเวอร์ชัน … เรียบร้อยแล้ว"** ยืนยัน
+
+ภาพ โมเดล AI และการตั้งค่ายังอยู่ครบหลังอัปเดต ปิดการตรวจอัตโนมัติได้ที่ "ตั้งค่าขั้นสูง"
+
+![แถบแจ้งอัปเดตพร้อมติดตั้ง](docs/images/update.png)
+
 ## ถอนการติดตั้ง
 
 ไปที่ **Settings → Apps → Installed apps → RemoveBG → Uninstall**
@@ -95,7 +133,7 @@
 
 ## ความเป็นส่วนตัว
 
-ภาพทั้งหมดประมวลผลบนเครื่องคุณ โปรแกรมเชื่อมต่ออินเทอร์เน็ตเฉพาะตอนดาวน์โหลดโมเดลจาก GitHub (ที่อยู่ `github.com/danielgatis/rembg/releases`) และเมื่อคุณกดลิงก์ไปหน้า GitHub นี้ ไม่มีการเก็บสถิติหรือส่งข้อมูลการใช้งาน
+ภาพทั้งหมดประมวลผลบนเครื่องคุณ โปรแกรมเชื่อมต่ออินเทอร์เน็ตเฉพาะตอนดาวน์โหลดโมเดลจาก GitHub (`github.com/danielgatis/rembg/releases`) ตอนตรวจหาและดาวน์โหลดอัปเดตจากหน้า Releases ของโปรแกรมนี้ และเมื่อคุณกดลิงก์ไปหน้า GitHub ไม่มีการเก็บสถิติหรือส่งข้อมูลการใช้งาน
 
 ---
 
@@ -120,6 +158,7 @@ src/main/worker.js    the AI process
 src/main/models.js    model list (URL, size, MD5, SHA-256), resumable verified download
 src/main/files.js     finding photos, naming results (never overwrites)
 src/main/settings.js  settings in %APPDATA%\RemoveBG\settings.json
+src/main/updater.js   update checks through GitHub Releases (electron-updater): announce, download with progress, restart to install
 src/renderer/         the window (no framework, strict CSP, preload bridge only)
 src/assets/self-test-model.onnx   224-byte stand-in model for tests (tools/make-test-model.py)
 ```
@@ -135,13 +174,14 @@ npm run dist      # Windows installer in dist/ (run on Windows)
 Notes:
 - Peak memory while a photo is processed is about 6.5 GB (lite) to 8 GB (best quality), because BiRefNet works at a fixed 1024×1024.
 - `enableMemPattern` is off in the ONNX Runtime session: with it on, the second photo in the same Electron process crashes (the allocator refuses one huge block). Covered by the worker test (two photos in a row).
-- `REMOVEBG_USER_DATA=<dir>` uses another data folder (tests); `REMOVEBG_DEBUG=<file>` writes the AI process output to a file.
+- `REMOVEBG_USER_DATA=<dir>` uses another data folder (tests); `REMOVEBG_DEBUG=<file>` writes the AI process output to a file; `REMOVEBG_FAKE_UPDATE=available|latest|error` (development runs only) plays the update screens without a release.
+- Updates: the installed app reads `latest.yml` from the latest GitHub Release, downloads only when the user agrees, and installs on "Restart and install" or when the app closes. The first start of a new version shows "Updated to version …".
 - `RemoveBG.exe --self-test=<result.json>` checks, inside the installed app, that the image library and ONNX Runtime load and cut out a test image with the stand-in model. CI runs it on the packaged and on the installed app.
 
 ### Releases
 
 [`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push and pull request on `windows-latest`: tests, installer build, self-test of the packaged app, silent install and self-test of the installed app. The installer is attached to the run as an artifact.
-To publish a release: set `version` in `package.json`, merge to `main`, then push a tag `vX.Y.Z` with the same version. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe` and `SHA256SUMS.txt` to a GitHub Release.
+To publish a release: set `version` in `package.json`, merge to `main`, then push a tag `vX.Y.Z` with the same version. The workflow attaches `RemoveBG-Setup-X.Y.Z.exe`, the same file as `RemoveBG-Setup.exe` (the stable name the download button links to through `releases/latest/download/`), and `SHA256SUMS.txt` to a GitHub Release.
 The installer is not code-signed, so Windows SmartScreen asks for confirmation (see Install, step 2).
 
 ## License and credits

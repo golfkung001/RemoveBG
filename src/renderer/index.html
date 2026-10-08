@@ -24,6 +24,17 @@
     </div>
   </header>
 
+  <!-- updates: what is happening, always in words -->
+  <div class="ubar" id="ubar" role="status" aria-live="polite" hidden>
+    <div class="ubar-icon" id="ubar-icon" aria-hidden="true"></div>
+    <div class="ubar-body">
+      <strong id="ubar-title"></strong>
+      <span id="ubar-text"></span>
+      <div class="bar ubar-progress" id="ubar-progress" hidden><span id="ubar-fill"></span></div>
+    </div>
+    <div class="ubar-actions" id="ubar-actions"></div>
+  </div>
+
   <!-- first run: get the model -->
   <main id="setup" class="setup" hidden>
     <section class="card setup-card">
@@ -121,6 +132,7 @@
         <div class="models compact" id="models-adv"></div>
         <label class="switch"><input type="checkbox" id="gpu"><span data-i18n="opt.gpu"></span></label>
         <p class="note" data-i18n="opt.gpu.note"></p>
+        <label class="switch"><input type="checkbox" id="auto-update"><span data-i18n="opt.autoUpdate"></span></label>
         <button type="button" class="link" id="data-folder" data-i18n="opt.dataFolder"></button>
       </details>
       </div>
@@ -137,6 +149,8 @@
 
   <footer class="foot">
     <span id="foot-model"></span><span id="foot-device"></span><span id="foot-version"></span>
+    <span id="foot-update"></span>
+    <button type="button" class="link" id="check-update" data-i18n="upd.check"></button>
     <button type="button" class="link" id="source" data-i18n="foot.source"></button>
   </footer>
 
@@ -173,6 +187,20 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- shown while the app closes to install an update -->
+  <div class="installing" id="installing" role="alertdialog" aria-modal="true" aria-labelledby="inst-title" aria-describedby="inst-text" hidden>
+    <div class="installing-box">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2 id="inst-title"></h2>
+      <p id="inst-text" data-i18n="upd.installing.text"></p>
+      <ol class="steps">
+        <li class="now" data-i18n="upd.step1"></li>
+        <li data-i18n="upd.step2"></li>
+        <li data-i18n="upd.step3"></li>
+      </ol>
+    </div>
+  </div>
 
   <script src="i18n.js"></script>
   <script src="app.js"></script>
